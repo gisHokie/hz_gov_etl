@@ -1,0 +1,15 @@
+-- View: public.svw_get_state_fips
+
+-- DROP VIEW public.svw_get_state_fips;
+
+CREATE OR REPLACE VIEW public.svw_get_state_fips
+ AS
+ SELECT fips_mapping.fips,
+    fips_mapping.stusab
+   FROM fips_mapping
+  ORDER BY fips_mapping.state_name;
+
+ALTER TABLE public.svw_get_state_fips
+    OWNER TO postgres;
+
+

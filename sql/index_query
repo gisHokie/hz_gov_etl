@@ -1,0 +1,4 @@
+-- Spatial Index query
+CREATE INDEX census_urban_area_geom_idx
+  ON public.census_urban_area
+  USING GIST (geom);
