@@ -2,8 +2,8 @@ version: 1
 main_title: US Census ACS5 ETL by Tract
 
 # Census and Bureau of Labe API Keys, Need to update
-census_key: 835fc8c5fd4f8b2524b83e4d8e71256cdd943261
-bls_key: b2e223449d9e411a9c25105c41279fbf
+census_key: <ENTER CENSUS KEY>
+bls_key: <ENTER BLS KEY>
 census_acs_year: 2018
 census_bls_year: 2019
 
