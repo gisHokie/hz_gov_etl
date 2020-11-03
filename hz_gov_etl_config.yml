@@ -1,0 +1,88 @@
+version: 1
+main_title: US Census ACS5 ETL by Tract
+
+# Census and Bureau of Labe API Keys, Need to update
+census_key: 835fc8c5fd4f8b2524b83e4d8e71256cdd943261
+bls_key: b2e223449d9e411a9c25105c41279fbf
+census_acs_year: 2018
+census_bls_year: 2019
+
+# May or may not be used, end points from a different source but important for future references
+#endpoint_url: 'https://api.census.gov/data/%s/%s'
+#definitions_url: 'https://api.census.gov/data/%s/%s/variables.json'
+#definition_url: 'https://api.census.gov/data/%s/%s/variables/%s.json'
+#groups_url: 'https://api.census.gov/data/%s/%s/groups.json'
+
+# Endpoints used to get data
+full_tract_api: 'https://api.census.gov/data/{yr}/acs/acs5/subject?get=NAME,{acs_codes}&for=tract:*&in=state:{fip_code}&in=county:*&key={census_key}'
+state_unemploy_rate: 'https://www.bls.gov/web/laus/laumstrk.htm'
+us_umemploy_rate: 'https://data.bls.gov/cgi-bin/surveymost'
+pop_county_api: 'https://api.census.gov/data/{yr}/pep/population?get=POP&for=county:*&in=state:*&key={census_key}'
+urban_areas: 'https://www2.census.gov/geo/tiger/TIGER{yr}/UAC/'
+
+#pop_tract_api:   'https://api.census.gov/data/2018/acs/acs5?get=B00001_001E&for=tract:*&in=state:01&in=county:*'
+#detail_tract_api: 'https://api.census.gov/data/{yr}/acs/acs5/?get=NAME,{acs_codes}&for=tract:*&in=state:{fip_code}&in=county:*&key={census_key}'
+
+# State FIPS min and max range.
+# To get only one state, add idnetical min and max value
+# Note that single digit Fips has a Zero "0" in front, these are text values NOT integers
+# Ranges are between 01 and 78
+acs_min_range: 01
+acs_max_range: 78
+
+# Series of codes for Census Employment only
+# This populates the "full_tract_api" key 
+census_codes:
+  - S2301_C01_001E
+  - S2301_C01_001M
+  - S2301_C02_001E
+  - S2301_C02_001M
+  - S2301_C03_001E
+  - S2301_C03_001M
+  - S2301_C04_001E
+  - S2301_C04_001M
+
+# List of Census Shapefiles requried
+# The Zip needs to match what is shown in the URL (example: https://www2.census.gov/geo/tiger/TIGER2019/UAC/ shows zip named tl_2019_us_uac10.zip )
+# The shp_admin_type needs to match the name in the URL (example: "UAC" is from the URL "https://www2.census.gov/geo/tiger/TIGER2019/UAC/" )
+# Shapefile locations will be in the shp directory 
+# shp_year states which year to get the shapefile
+census_shp_ftp_url:
+  shp_ftp_url: https://www2.census.gov/geo/tiger/TIGER{}/{}/
+  shp_year: 2019
+  shp_directory: shp
+  zip_directory: zip
+
+census_shp_info:
+  TRACT:
+    - tl_{}_{}_tract.zip
+    - public.census_tract
+    - MULTIPOLYGON
+  COUNTY:
+    - tl_{}_us_county.zip
+    - public.census_county
+    - MULTIPOLYGON
+  STATE:
+    - tl_{}_us_state.zip
+    - public.census_state
+    - MULTIPOLYGON
+  UAC:
+    - tl_{}_us_uac10.zip
+    - public.census_urban_area
+    - MULTIPOLYGON
+
+# Postgres connections
+pg:
+  pg_host: localhost
+  pg_port: 5432
+  pg_database: hub_geo
+  pg_user: postgres
+  pg_pwd: postgres
+  pg_schema: public
+
+# SQL Functions, Views, or Stored Procedures 
+sql:
+  get_fips_abbv: public.svw_get_state_fips
+  get_all_acs_years: public.svw_get_all_years_acs_emp_all
+  fx_insert_population: public.fx_insert_census_pop
+  fx_insert_acs_emp: public.fx_insert_acs_emp_all
